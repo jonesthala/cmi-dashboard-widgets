@@ -14,97 +14,79 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, #009DDB, #0077A6);
+  background: linear-gradient(180deg, var(--cmi-blue), var(--cmi-dark));
   color: white;
-  height: 300px;
-  overflow: hidden;
-  position: relative; /* WICHTIG */
 }
 
-/* CONTENT */
-.content {
-  flex: 1;
-  padding: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Container */
+.wrapper {
+  padding: 15px;
+  text-align: center;
 }
 
+/* Wetter Karte (kleiner) */
 .card {
   background: rgba(255,255,255,0.15);
   backdrop-filter: blur(8px);
-  border-radius: 20px;
-  padding: 15px 20px;
-  text-align: center;
-  max-width: 500px;
-  width: 100%;
+  border-radius: 16px;
+  padding: 15px;
+  max-width: 360px;
+  margin: 0 auto;
 }
 
 .greeting {
-  font-size: 28px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 4px;
 }
 
 .city {
-  font-size: 18px;
+  font-size: 14px;
   opacity: 0.9;
 }
 
 .temp {
-  font-size: 60px;
+  font-size: 42px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 .desc {
-  font-size: 18px;
+  font-size: 14px;
 }
 
-/* ILLUSTRATION AREA */
+/* Illustration (grösser + besser sichtbar) */
 .illustration {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  height: 100px;
-  overflow: hidden;
-}
-
-/* weicher Übergang */
-.illustration::before {
-  content: "";
-  position: absolute;
-  top: -80px;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to bottom, transparent, var(--cmi-dark));
-  z-index: 2;
-}
-
-/* Bild */
-.illustration img {
-  width: 100%;
-  height: 100%;
+  height: 140px;
   object-fit: cover;
   object-position: center top;
+  margin-top: 12px;
+  border-top: 2px solid rgba(255,255,255,0.2);
+}
+
+/* sanfter Übergang */
+.fade {
+  height: 15px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15), transparent);
+  margin-top: -10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="content">
+<div class="wrapper">
   <div class="card">
     <div class="greeting" id="greeting">Guten Tag 👋</div>
     <div class="city">Zürich</div>
     <div class="temp">14°C</div>
     <div class="desc">Leicht bewölkt</div>
   </div>
-</div>
 
-<div class="illustration">
-  <img src="cmi-illustration.jpg" alt="CMI Illustration">
+  <div class="fade"></div>
+
+  <!-- grössere Illustration -->
+  <img class="illustration" src="cmi-illustration.jpg" alt="CMI Illustration">
 </div>
 
 <script>
