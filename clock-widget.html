@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Clock Widget</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #005EA8; /* CMI Blau */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    text-align: center;
+  }
+
+  .greeting {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .clock {
+    font-size: 60px;
+    font-weight: bold;
+  }
+
+  .date {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="greeting" id="greeting">Hallo</div>
+  <div class="clock" id="clock">00:00:00</div>
+  <div class="date" id="date">Datum</div>
+</div>
+
+<script>
+function updateClock() {
+  const now = new Date();
+
+  // Zeit
+  const time = now.toLocaleTimeString('de-CH');
+  document.getElementById('clock').textContent = time;
+
+  // Datum
+  const date = now.toLocaleDateString('de-CH', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  document.getElementById('date').textContent = date;
+
+  // Begrüssung
+  const hour = now.getHours();
+  let greeting = "Hallo";
+
+  if (hour < 12) greeting = "Guten Morgen";
+  else if (hour < 18) greeting = "Guten Tag";
+  else greeting = "Guten Abend";
+
+  document.getElementById('greeting').textContent = greeting;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
