@@ -2,77 +2,95 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Clock Widget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMI Wetter Widget</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #005EA8; /* CMI Blau */
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+:root {
+  --cmi-blue: #009DDB;
+  --cmi-dark: #0077A6;
+}
 
-  .container {
-    text-align: center;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, var(--cmi-blue), var(--cmi-dark));
+  color: white;
+}
 
-  .greeting {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
+/* Container */
+.wrapper {
+  padding: 20px;
+  text-align: center;
+}
 
-  .clock {
-    font-size: 60px;
-    font-weight: bold;
-  }
+/* Wetter Karte */
+.card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
 
-  .date {
-    font-size: 18px;
-    margin-top: 10px;
-  }
+.greeting {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.city {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.temp {
+  font-size: 48px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.desc {
+  font-size: 16px;
+}
+
+/* Illustration */
+.illustration {
+  width: 100%;
+  max-height: 100px;
+  object-fit: cover;
+  margin-top: 15px;
+  border-top: 2px solid rgba(255,255,255,0.2);
+}
 </style>
 </head>
+
 <body>
 
-<div class="container">
-  <div class="greeting" id="greeting">Hallo</div>
-  <div class="clock" id="clock">00:00:00</div>
-  <div class="date" id="date">Datum</div>
+<div class="wrapper">
+  <div class="card">
+    <div class="greeting" id="greeting">Guten Tag 👋</div>
+    <div class="city">Zürich</div>
+    <div class="temp">14°C</div>
+    <div class="desc">Leicht bewölkt</div>
+  </div>
+
+  <!-- Illustration direkt darunter -->
+  <img class="illustration" src="cmi-illustration.jpg" alt="CMI Illustration">
 </div>
 
 <script>
-function updateClock() {
-  const now = new Date();
+function updateGreeting() {
+  const hour = new Date().getHours();
+  let greeting = "Guten Tag 👋";
 
-  // Zeit
-  const time = now.toLocaleTimeString('de-CH');
-  document.getElementById('clock').textContent = time;
+  if (hour < 12) greeting = "Guten Morgen 👋";
+  else if (hour >= 18) greeting = "Guten Abend 👋";
 
-  // Datum
-  const date = now.toLocaleDateString('de-CH', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-  document.getElementById('date').textContent = date;
-
-  // Begrüssung
-  const hour = now.getHours();
-  let greeting = "Hallo";
-
-  if (hour < 12) greeting = "Guten Morgen";
-  else if (hour < 18) greeting = "Guten Tag";
-  else greeting = "Guten Abend";
-
-  document.getElementById('greeting').textContent = greeting;
+  document.getElementById("greeting").textContent = greeting;
 }
 
-setInterval(updateClock, 1000);
-updateClock();
+updateGreeting();
 </script>
 
 </body>
