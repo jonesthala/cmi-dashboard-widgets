@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CMI Wetter Widget</title>
+<title>CMI Wetter Mini</title>
 
 <style>
 :root {
@@ -11,86 +11,87 @@
   --cmi-dark: #0077A6;
 }
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(180deg, var(--cmi-blue), var(--cmi-dark));
+  background: linear-gradient(135deg, var(--cmi-blue), var(--cmi-dark));
   color: white;
 }
 
-/* Container */
-.wrapper {
-  padding: 20px;
+/* kompakter container */
+.widget {
+  height: 120px; /* 🔥 klein */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* card */
+.card {
   text-align: center;
 }
 
-/* Wetter Karte */
-.card {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 20px;
-  padding: 20px;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.greeting {
-  font-size: 24px;
-  margin-bottom: 5px;
-}
-
 .city {
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.9;
 }
 
 .temp {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 4px 0;
 }
 
 .desc {
-  font-size: 16px;
-}
-
-/* Illustration */
-.illustration {
-  width: 100%;
-  max-height: 100px;
-  object-fit: cover;
-  margin-top: 15px;
-  border-top: 2px solid rgba(255,255,255,0.2);
+  font-size: 14px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
+<div class="widget">
   <div class="card">
-    <div class="greeting" id="greeting">Guten Tag 👋</div>
     <div class="city">Zürich</div>
-    <div class="temp">14°C</div>
-    <div class="desc">Leicht bewölkt</div>
+    <div class="temp" id="temp">--°C</div>
+    <div class="desc" id="desc">Lädt...</div>
   </div>
-
-  <!-- Illustration direkt darunter -->
-  <img class="illustration" src="cmi-illustration.jpg" alt="CMI Illustration">
 </div>
 
 <script>
-function updateGreeting() {
-  const hour = new Date().getHours();
-  let greeting = "Guten Tag 👋";
-
-  if (hour < 12) greeting = "Guten Morgen 👋";
-  else if (hour >= 18) greeting = "Guten Abend 👋";
-
-  document.getElementById("greeting").textContent = greeting;
+function weatherCodeToText(code) {
+  const map = {
+    0: "Klar",
+    1: "Sonnig",
+    2: "Teilweise bewölkt",
+    3: "Bewölkt",
+    45: "Neblig",
+    61: "Regen",
+    71: "Schnee",
+    80: "Regenschauer",
+    95: "Gewitter"
+  };
+  return map[code] || "Unbekannt";
 }
 
-updateGreeting();
+async function loadWeather() {
+  try {
+    const url = "https://api.open-meteo.com/v1/forecast?latitude=47.3769&longitude=8.5417&current=temperature_2m,weather_code&timezone=auto";
+    const response = await fetch(url);
+    const data = await response.json();
+
+    const temp = Math.round(data.current.temperature_2m);
+    const desc = weatherCodeToText(data.current.weather_code);
+
+    document.getElementById("temp").textContent = temp + "°C";
+    document.getElementById("desc").textContent = desc;
+  } catch (e) {
+    document.getElementById("desc").textContent = "Fehler";
+  }
+}
+
+loadWeather();
 </script>
 
 </body>
