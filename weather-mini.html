@@ -7,32 +7,30 @@
 
 <style>
 :root {
-  --cmi-blue: #009DDB;
-  --cmi-dark: #0077A6;
+  --cmi-main: #2596be;
+  --cmi-dark: #1f7fa1; /* etwas dunkler für Verlauf */
 }
 
 html, body {
   margin: 0;
   height: 100%;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, var(--cmi-blue), var(--cmi-dark));
+  background: linear-gradient(135deg, var(--cmi-main), var(--cmi-dark));
   color: white;
 }
 
-/* 🔥 perfekt zentrieren */
+/* perfekt zentriert */
 .widget {
   height: 100%;
   display: flex;
-  align-items: center;      /* vertikal */
-  justify-content: center;  /* horizontal */
+  align-items: center;
+  justify-content: center;
 }
 
-/* Inhalt */
 .card {
   text-align: center;
 }
 
-/* Text */
 .city {
   font-size: 14px;
   opacity: 0.9;
