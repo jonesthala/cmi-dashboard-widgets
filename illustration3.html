@@ -34,16 +34,16 @@ html, body {
   width: 50%;
   height: 100%;
   object-fit: cover;
-  object-position: center bottom;
+  object-position: center 50%;
   display: block;
 }
 
-/* Fade oben: nur leicht */
+/* Fade oben: sehr minimal */
 .banner::after {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 30%;
+  height: 8%;
   background: linear-gradient(to bottom, #f0f0f0 0%, transparent 100%);
   pointer-events: none;
 }
@@ -54,8 +54,8 @@ html, body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to right, #f0f0f0 0%, transparent 4%),
-    linear-gradient(to left,  #f0f0f0 0%, transparent 4%);
+    linear-gradient(to right, #f0f0f0 0%, transparent 1.5%),
+    linear-gradient(to left,  #f0f0f0 0%, transparent 1.5%);
   pointer-events: none;
   z-index: 1;
 }
