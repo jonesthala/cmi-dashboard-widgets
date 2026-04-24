@@ -5,53 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CMI Wetter</title>
 <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 html, body {
-  margin: 0;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  min-width: 100%;
+  min-height: 100%;
   font-family: Arial, sans-serif;
+  overflow: hidden;
   background: #009fe3;
-  color: white;
 }
+
 .widget {
-  height: 100%;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wetter – obere Hälfte, blauer Himmel */
+.weather {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 65%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.card {
+  flex-direction: column;
   text-align: center;
+  color: white;
+  background: #009fe3;
 }
+
 .city {
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.85;
-  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
+
 .temp {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: bold;
-  margin: 4px 0;
   line-height: 1;
+  margin: 4px 0;
 }
+
 .desc {
   font-size: 13px;
   opacity: 0.9;
 }
-.error {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-top: 4px;
+
+/* Illustration-Bereich */
+.illustration-wrap {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  margin-top: -30px;
+}
+
+.illustration-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  display: block;
+}
+
+/* Fade: Illustration oben ins Blaue/Weisse blenden */
+.illustration-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 75%;
+  /* Von #009fe3 oben → transparent unten, damit Illustration ins Blau übergeht */
+  background: linear-gradient(
+    to bottom,
+    #009fe3 0%,
+    rgba(255,255,255,0.95) 30%,
+    rgba(255,255,255,0.5) 55%,
+    rgba(255,255,255,0) 100%
+  );
+  z-index: 3;
+  pointer-events: none;
 }
 </style>
 </head>
 <body>
 <div class="widget">
-  <div class="card">
+
+  <div class="weather">
     <div class="city" id="city">Standort wird ermittelt…</div>
     <div class="temp" id="temp">--°C</div>
     <div class="desc" id="desc"></div>
-    <div class="error" id="error"></div>
   </div>
+
+  <div class="illustration-wrap">
+    <img src="cmi-illustration.jpg" alt="CMI Landschaft">
+  </div>
+
 </div>
+
 <script>
 function weatherCodeToText(code) {
   if (code === 0 || code === 1) return "Klar";
@@ -71,45 +126,28 @@ async function loadWeather(lat, lon, cityName) {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
     const res = await fetch(url);
     const data = await res.json();
-    const temp = Math.round(data.current.temperature_2m);
-    const desc = weatherCodeToText(data.current.weather_code);
-    document.getElementById("temp").textContent = temp + "°C";
-    document.getElementById("desc").textContent = desc;
+    document.getElementById("temp").textContent = Math.round(data.current.temperature_2m) + "°C";
+    document.getElementById("desc").textContent = weatherCodeToText(data.current.weather_code);
     document.getElementById("city").textContent = cityName;
-  } catch (e) {
+  } catch {
     document.getElementById("desc").textContent = "Fehler beim Laden";
   }
 }
 
-async function getCityName(lat, lon) {
-  try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`);
-    const data = await res.json();
-    return data.address?.city || data.address?.town || data.address?.village || data.address?.county || "Standort";
-  } catch {
-    return "Standort";
-  }
-}
 
-function init() {
-  if (!navigator.geolocation) {
-    // Fallback: Zürich
-    document.getElementById("city").textContent = "Zürich";
-    loadWeather(47.3769, 8.5417, "Zürich");
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      const city = await getCityName(latitude, longitude);
-      loadWeather(latitude, longitude, city);
-    },
-    () => {
-      // Kein Zugriff → Fallback Zürich
+async function init() {
+  try {
+    // IP-basierte Standorterkennung – kein Browser-Popup nötig
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    if (data && data.latitude && data.city) {
+      loadWeather(data.latitude, data.longitude, data.city);
+    } else {
       loadWeather(47.3769, 8.5417, "Zürich");
-    },
-    { timeout: 5000 }
-  );
+    }
+  } catch {
+    loadWeather(47.3769, 8.5417, "Zürich");
+  }
 }
 
 init();
