@@ -166,8 +166,7 @@ async function load() {
     ]);
     const summary = await summaryRes.json();
     const compRaw = await compRes.json();
-    // API gibt manchmal Objekt statt Array zurück
-    const components = Array.isArray(compRaw) ? compRaw : Object.values(compRaw);
+    const components = compRaw.components || (Array.isArray(compRaw) ? compRaw : Object.values(compRaw));
 
     const isUp = summary.page.status === "UP";
     const hasIncident = summary.activeIncidents && summary.activeIncidents.length > 0;
