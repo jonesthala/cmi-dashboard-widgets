@@ -165,7 +165,9 @@ async function load() {
       fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/components.json"))
     ]);
     const summary = await summaryRes.json();
-    const components = await compRes.json();
+    const compRaw = await compRes.json();
+    // API gibt manchmal Objekt statt Array zurück
+    const components = Array.isArray(compRaw) ? compRaw : Object.values(compRaw);
 
     const isUp = summary.page.status === "UP";
     const hasIncident = summary.activeIncidents && summary.activeIncidents.length > 0;
