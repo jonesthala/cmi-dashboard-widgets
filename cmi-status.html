@@ -12,219 +12,77 @@ html, body {
   height: 100%;
   font-family: Arial, sans-serif;
   background: white;
-  color: #333;
 }
 
-.widget {
+a.widget {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
-  flex-direction: column;
-  padding: 14px 16px;
-  overflow-y: auto;
-}
-
-.header {
-  display: flex;
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
   gap: 8px;
-  margin-bottom: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+a.widget:hover { background: #f5f5f5; }
 
-.header-dot {
-  width: 10px;
-  height: 10px;
+.dot {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  flex-shrink: 0;
+  background: #ccc;
 }
 
-.header-title {
-  font-size: 13px;
+.status-text {
+  font-size: 14px;
   font-weight: bold;
   color: #333;
 }
 
-.header-sub {
+.sub {
   font-size: 11px;
-  color: #888;
-  margin-left: auto;
-}
-
-.status-badge {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-bottom: 12px;
-  display: inline-block;
-}
-
-.badge-up       { background: #e6f9ee; color: #1a9e4a; }
-.badge-incident { background: #fff3e0; color: #e07800; }
-.badge-outage   { background: #fdecea; color: #d32f2f; }
-
-.components {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.component {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  padding: 5px 8px;
-  border-radius: 6px;
-  background: #f7f7f7;
-}
-
-.component-name {
-  color: #444;
-}
-
-.component-status {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.dot-ok       { background: #1a9e4a; }
-.dot-warn     { background: #e07800; }
-.dot-outage   { background: #d32f2f; }
-.dot-maint    { background: #009fe3; }
-
-.maintenance-box {
-  margin-top: 12px;
-  background: #e8f4fd;
-  border-left: 3px solid #009fe3;
-  border-radius: 4px;
-  padding: 7px 10px;
-  font-size: 10px;
-  color: #555;
-}
-
-.maintenance-box strong {
-  display: block;
-  color: #009fe3;
-  font-size: 11px;
-  margin-bottom: 3px;
-}
-
-.footer {
-  margin-top: auto;
-  padding-top: 10px;
-  font-size: 10px;
-  color: #bbb;
-  text-align: right;
-}
-
-.footer a {
-  color: #009fe3;
-  text-decoration: none;
-}
-
-.loading {
-  font-size: 12px;
   color: #aaa;
-  text-align: center;
-  margin-top: 20px;
 }
 </style>
 </head>
 <body>
-<div class="widget">
-  <div id="content" class="loading">Lädt…</div>
-</div>
+<a class="widget" href="https://status.cmicloud.ch" target="_blank">
+  <div class="dot" id="dot"></div>
+  <span class="status-text" id="text">Lädt…</span>
+  <span class="sub" id="sub">CMI Cloud Status</span>
+</a>
 
 <script>
-function statusLabel(s) {
-  switch(s) {
-    case "OPERATIONAL": return { text: "Funktionsfähig", cls: "dot-ok", label: "OK" };
-    case "UNDERMAINTENANCE": return { text: "Wartung", cls: "dot-maint", label: "Wartung" };
-    case "DEGRADEDPERFORMANCE": return { text: "Eingeschränkt", cls: "dot-warn", label: "Eingeschränkt" };
-    case "PARTIALOUTAGE": return { text: "Teilausfall", cls: "dot-warn", label: "Teilausfall" };
-    case "MAJOROUTAGE": return { text: "Ausfall", cls: "dot-outage", label: "Ausfall" };
-    default: return { text: s, cls: "dot-ok", label: s };
-  }
-}
-
 async function load() {
-  const el = document.getElementById("content");
   try {
-    const [summaryRes, compRes] = await Promise.all([
-      fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/summary.json")),
-      fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/components.json"))
-    ]);
-    const summary = await summaryRes.json();
-    const compRaw = await compRes.json();
-    const components = compRaw.components || (Array.isArray(compRaw) ? compRaw : Object.values(compRaw));
+    const res = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/summary.json"));
+    const summary = await res.json();
 
     const isUp = summary.page.status === "UP";
     const hasIncident = summary.activeIncidents && summary.activeIncidents.length > 0;
     const hasMaint = summary.activeMaintenances && summary.activeMaintenances.length > 0;
 
-    let badgeCls = "badge-up";
-    let badgeText = "Alle Systeme funktionieren";
-    if (hasIncident) { badgeCls = "badge-incident"; badgeText = "Störung aktiv"; }
-    if (!isUp) { badgeCls = "badge-outage"; badgeText = "Problem erkannt"; }
+    let color = "#1a9e4a";
+    let text = "Alle Systeme OK";
+    let sub = "CMI Cloud Status";
 
-    // Header dot color
-    let dotColor = "#1a9e4a";
-    if (hasIncident) dotColor = "#e07800";
-    if (!isUp) dotColor = "#d32f2f";
+    if (hasIncident) { color = "#e07800"; text = "Störung aktiv"; }
+    if (!isUp)        { color = "#d32f2f"; text = "Problem erkannt"; }
+    if (isUp && !hasIncident && hasMaint) { sub = "🔧 Wartung geplant"; }
 
-    // Components HTML
-    const compHTML = components.map(c => {
-      const s = statusLabel(c.status);
-      return `
-        <div class="component">
-          <span class="component-name">${c.name}</span>
-          <span class="component-status">
-            <span class="dot ${s.cls}"></span>
-            ${s.text}
-          </span>
-        </div>`;
-    }).join("");
-
-    // Maintenance box
-    let maintHTML = "";
-    if (hasMaint) {
-      const m = summary.activeMaintenances[0];
-      const start = new Date(m.start || m.started).toLocaleString("de-CH");
-      maintHTML = `
-        <div class="maintenance-box">
-          <strong>🔧 Geplante Wartung</strong>
-          ${m.name}<br>ab ${start}
-        </div>`;
-    }
-
-    el.innerHTML = `
-      <div class="header">
-        <span class="header-dot" style="background:${dotColor}"></span>
-        <span class="header-title">CMI Cloud Status</span>
-        <span class="header-sub">↻ live</span>
-      </div>
-      <span class="status-badge ${badgeCls}">${badgeText}</span>
-      <div class="components">${compHTML}</div>
-      ${maintHTML}
-      <div class="footer"><a href="https://status.cmicloud.ch" target="_blank">status.cmicloud.ch</a></div>
-    `;
-  } catch(e) {
-    el.innerHTML = `<div class="loading">Fehler: ${e.message}</div>`;
+    document.getElementById("dot").style.background = color;
+    document.getElementById("text").textContent = text;
+    document.getElementById("text").style.color = color;
+    document.getElementById("sub").textContent = sub;
+  } catch {
+    document.getElementById("dot").style.background = "#ccc";
+    document.getElementById("text").textContent = "Status unbekannt";
   }
 }
 
 load();
-// Alle 60 Sekunden aktualisieren
 setInterval(load, 60000);
 </script>
 </body>
