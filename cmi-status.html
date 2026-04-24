@@ -160,15 +160,12 @@ function statusLabel(s) {
 async function load() {
   const el = document.getElementById("content");
   try {
-    const proxy = "https://api.allorigins.win/get?url=";
     const [summaryRes, compRes] = await Promise.all([
-      fetch(proxy + encodeURIComponent("https://status.cmicloud.ch/v3/summary.json")),
-      fetch(proxy + encodeURIComponent("https://status.cmicloud.ch/v3/components.json"))
+      fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/summary.json")),
+      fetch("https://corsproxy.io/?" + encodeURIComponent("https://status.cmicloud.ch/v3/components.json"))
     ]);
-    const summaryData = await summaryRes.json();
-    const compData = await compRes.json();
-    const summary = JSON.parse(summaryData.contents);
-    const components = JSON.parse(compData.contents);
+    const summary = await summaryRes.json();
+    const components = await compRes.json();
 
     const isUp = summary.page.status === "UP";
     const hasIncident = summary.activeIncidents && summary.activeIncidents.length > 0;
@@ -221,7 +218,7 @@ async function load() {
       <div class="footer"><a href="https://status.cmicloud.ch" target="_blank">status.cmicloud.ch</a></div>
     `;
   } catch(e) {
-    el.innerHTML = `<div class="loading">Status konnte nicht geladen werden.</div>`;
+    el.innerHTML = `<div class="loading">Fehler: ${e.message}</div>`;
   }
 }
 
