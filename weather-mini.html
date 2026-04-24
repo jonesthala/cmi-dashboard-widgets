@@ -8,6 +8,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
+  width: 100%;
   height: 100%;
   font-family: Arial, sans-serif;
   overflow: hidden;
@@ -15,6 +16,7 @@ html, body {
 }
 
 .widget {
+  width: 100%;
   height: 100%;
   position: relative;
   display: flex;
@@ -25,7 +27,7 @@ html, body {
 .weather {
   position: relative;
   z-index: 1;
-  flex: 0 0 58%;
+  flex: 0 0 55%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,21 +38,21 @@ html, body {
 }
 
 .city {
-  font-size: 7px;
+  font-size: 13px;
   opacity: 0.85;
   letter-spacing: 0.5px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .temp {
-  font-size: 24px;
+  font-size: 42px;
   font-weight: bold;
   line-height: 1;
-  margin: 2px 0;
+  margin: 4px 0;
 }
 
 .desc {
-  font-size: 7px;
+  font-size: 13px;
   opacity: 0.9;
 }
 
@@ -59,7 +61,7 @@ html, body {
   position: relative;
   z-index: 2;
   flex: 1;
-  margin-top: -40px;
+  margin-top: -50px;
 }
 
 .illustration-wrap img {
